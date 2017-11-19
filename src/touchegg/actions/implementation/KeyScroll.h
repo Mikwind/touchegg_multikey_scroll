@@ -77,14 +77,24 @@ private:
     //------------------------------------------------------------------------------------------------------------------
     protected:
     /**
-     * Helper method to actually send the keys.
+     * Helper method to actually send the keys when scrolling up.
      */
     void sendKeysUp();
     
     /**
-     * Helper method to actually send the keys.
+     * Helper method to actually send the keys when scrolling down.
      */
     void sendKeysDown();
+    
+    /**
+     * Helper method to actually send the keys when scrolling right.
+     */
+    void sendKeysRight();
+    
+    /**
+     * Helper method to actually send the keys when scrolling left.
+     */
+    void sendKeysLeft();
 
     /**
      * Keys to hold down while sending the rest of keys.
@@ -92,11 +102,24 @@ private:
     QList<KeyCode> holdDownKeys;
 
     /**
-     * Keys to send while holdDownKeys are sending.
+     * Keys to send while holdDownKeys are sending and scrolling up.
      */
     QList<KeyCode> pressBetweenKeysUp;
     
+    /**
+     * Keys to send while holdDownKeys are sending and scrolling down.
+     */
     QList<KeyCode> pressBetweenKeysDown;
+    
+    /**
+     * Keys to send while holdDownKeys are sending and scrolling left.
+     */
+    QList<KeyCode> pressBetweenKeysLeft;
+    
+    /**
+     * Keys to send while holdDownKeys are sending and scrolling right.
+     */
+    QList<KeyCode> pressBetweenKeysRight;
 
 };
 

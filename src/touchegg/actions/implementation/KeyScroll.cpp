@@ -36,53 +36,67 @@ KeyScroll::KeyScroll(const QString &settings, Window window)
     bool error = false;
 
     QStringList mainStr = settings.split(":");
-    if (mainStr.length() != 2)
+    if (mainStr.length() < 2)
         error = true;
+    
+    foreach(QString setting , mainStr){
+        QStringList settingPair = ((QString)setting).split("=");
+        if(!error && settingPair.length() == 2){
+            if(settingPair.at(0) == "SPEED") {
+                
+                bool ok;
+                int configSpeed = QString(settingPair.at(1)).toInt(&ok);
+                if (ok && configSpeed >= 1 && configSpeed <= 10) {
+                    this->verticalSpeed   = 220 - 20 * configSpeed;
+                    this->horizontalSpeed = 220 - 20 * configSpeed;
+                } else {
+                    error = true;
+                }
 
-    // Speed
-    QStringList mainStrSpeed = ((QString)mainStr.at(0)).split("=");
-    if (!error && mainStrSpeed.length() == 2 && mainStrSpeed.at(0) == "SPEED") {
-        bool ok;
-        int configSpeed = QString(mainStrSpeed.at(1)).toInt(&ok);
-        if (ok && configSpeed >= 1 && configSpeed <= 10) {
-            this->verticalSpeed   = 100 - 2 * configSpeed;
-            this->horizontalSpeed = 100 - 2 * configSpeed;
+            } else if(settingPair.at(0) == "MOD"){
+                // Read modifier keys to send from the configuration
+                QStringList keys = ((QString)settingPair.at(1)).split("+");
+                foreach(QString key, keys) {
+                    if (key == "Control" || key == "Shift" || key == "Super" || key == "Alt") {
+                        key = key.append("_L");
+                        KeySym keySym = XStringToKeysym(key.toStdString().c_str());
+                        KeyCode keyCode = XKeysymToKeycode(QX11Info::display(), keySym);
+                        this->holdDownKeys.append(keyCode);
+
+                    } else if (key == "AltGr") {
+                        KeySym keySym = XStringToKeysym("Alt_R");
+                        KeyCode keyCode = XKeysymToKeycode(QX11Info::display(), keySym);
+                        this->holdDownKeys.append(keyCode);
+
+                    }
+                }
+
+            } else if(settingPair.at(0) == "UP"){
+                KeySym keySym = XStringToKeysym(settingPair.at(1).toStdString().c_str());
+                KeyCode keyCode = XKeysymToKeycode(QX11Info::display(), keySym);
+                this->pressBetweenKeysUp.append(keyCode);
+
+            } else if(settingPair.at(0) == "DOWN"){
+                KeySym keySym = XStringToKeysym(settingPair.at(1).toStdString().c_str());
+                KeyCode keyCode = XKeysymToKeycode(QX11Info::display(), keySym);
+                this->pressBetweenKeysDown.append(keyCode);
+
+            } else if(settingPair.at(0) == "LEFT"){
+                KeySym keySym = XStringToKeysym(settingPair.at(1).toStdString().c_str());
+                KeyCode keyCode = XKeysymToKeycode(QX11Info::display(), keySym);
+                this->pressBetweenKeysLeft.append(keyCode);
+
+            } else if(settingPair.at(0) == "RIGHT"){
+                KeySym keySym = XStringToKeysym(settingPair.at(1).toStdString().c_str());
+                KeyCode keyCode = XKeysymToKeycode(QX11Info::display(), keySym);
+                this->pressBetweenKeysRight.append(keyCode);
+            } else {
+                error = true;
+            }
         } else {
             error = true;
         }
-    } else {
-        error = true;
     }
-
-    // Read the keys to send from te configuration
-    QStringList keys = ((QString)mainStr.at(1)).split("+");
-    size_t k = 0;
-
-    foreach(QString key, keys) {
-        if (key == "Control" || key == "Shift" || key == "Super" || key == "Alt") {
-            key = key.append("_L");
-            KeySym keySym = XStringToKeysym(key.toStdString().c_str());
-            KeyCode keyCode = XKeysymToKeycode(QX11Info::display(), keySym);
-            this->holdDownKeys.append(keyCode);
-
-        } else if (key == "AltGr") {
-            KeySym keySym = XStringToKeysym("Alt_R");
-            KeyCode keyCode = XKeysymToKeycode(QX11Info::display(), keySym);
-            this->holdDownKeys.append(keyCode);
-
-        } else {
-            KeySym keySym = XStringToKeysym(key.toStdString().c_str());
-            KeyCode keyCode = XKeysymToKeycode(QX11Info::display(), keySym);
-            if(k == 0){
-                this->pressBetweenKeysUp.append(keyCode);
-            }
-            if(k == 1){
-                this->pressBetweenKeysDown.append(keyCode);
-            }
-            k++;
-        }
-    }
-
 
     if (error) {
         qWarning() << "Error reading KEYSCROLL settings, using the default settings";
@@ -148,6 +162,7 @@ void KeyScroll::executeUpdate(const QHash<QString, QVariant>& attrs)
         while (this->rightKeyScrollSpace >= this->horizontalSpeed) {
             this->rightKeyScrollSpace -= this->horizontalSpeed;
             //RIGHT
+            sendKeysRight();
             XFlush(QX11Info::display());
         }
 
@@ -157,6 +172,7 @@ void KeyScroll::executeUpdate(const QHash<QString, QVariant>& attrs)
         while (this->leftKeyScrollSpace >= this->horizontalSpeed) {
             this->leftKeyScrollSpace -= this->horizontalSpeed;
             //LEFT
+            sendKeysLeft();
             XFlush(QX11Info::display());
         }
     }
@@ -179,5 +195,19 @@ void KeyScroll::sendKeysDown() {
     for (int n = 0; n < this->pressBetweenKeysDown.length(); n++) {
         XTestFakeKeyEvent(QX11Info::display(), this->pressBetweenKeysDown.at(n), true, 0);
         XTestFakeKeyEvent(QX11Info::display(), this->pressBetweenKeysDown.at(n), false, 0);
+    }
+}
+
+void KeyScroll::sendKeysRight() {
+    for (int n = 0; n < this->pressBetweenKeysRight.length(); n++) {
+        XTestFakeKeyEvent(QX11Info::display(), this->pressBetweenKeysRight.at(n), true, 0);
+        XTestFakeKeyEvent(QX11Info::display(), this->pressBetweenKeysRight.at(n), false, 0);
+    }
+}
+
+void KeyScroll::sendKeysLeft() {
+    for (int n = 0; n < this->pressBetweenKeysDown.length(); n++) {
+        XTestFakeKeyEvent(QX11Info::display(), this->pressBetweenKeysLeft.at(n), true, 0);
+        XTestFakeKeyEvent(QX11Info::display(), this->pressBetweenKeysLeft.at(n), false, 0);
     }
 }
