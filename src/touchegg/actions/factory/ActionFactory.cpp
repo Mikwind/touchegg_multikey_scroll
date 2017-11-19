@@ -51,6 +51,9 @@ Action *ActionFactory::createAction(ActionTypeEnum::ActionType actionType,
 
     case ActionTypeEnum::SCROLL:
         return new Scroll(settings, window);
+        
+    case ActionTypeEnum::KEYSCROLL:
+        return new KeyScroll(settings, window);
 
     case ActionTypeEnum::MINIMIZE_WINDOW:
         return new MinimizeWindow(settings, timing, window);

@@ -27,6 +27,7 @@
 #include "src/touchegg/actions/implementation/Action.h"
 #include "src/touchegg/actions/implementation/MouseClick.h"
 #include "src/touchegg/actions/implementation/Scroll.h"
+#include "src/touchegg/actions/implementation/KeyScroll.h"
 #include "src/touchegg/actions/implementation/MinimizeWindow.h"
 #include "src/touchegg/actions/implementation/MaximizeRestoreWindow.h"
 #include "src/touchegg/actions/implementation/CloseWindow.h"

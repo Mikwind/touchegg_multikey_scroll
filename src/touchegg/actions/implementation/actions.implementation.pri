@@ -13,7 +13,8 @@ HEADERS += \
     src/touchegg/actions/implementation/DragAndDrop.h \
     src/touchegg/actions/implementation/ChangeViewport.h \
     src/touchegg/actions/implementation/MouseClick.h \
-    src/touchegg/actions/implementation/Scroll.h
+    src/touchegg/actions/implementation/Scroll.h \
+    src/touchegg/actions/implementation/KeyScroll.h
 
 SOURCES += \
     src/touchegg/actions/implementation/MinimizeWindow.cpp \
@@ -28,4 +29,5 @@ SOURCES += \
     src/touchegg/actions/implementation/DragAndDrop.cpp \
     src/touchegg/actions/implementation/ChangeViewport.cpp \
     src/touchegg/actions/implementation/MouseClick.cpp \
-    src/touchegg/actions/implementation/Scroll.cpp
+    src/touchegg/actions/implementation/Scroll.cpp \
+    src/touchegg/actions/implementation/KeyScroll.cpp

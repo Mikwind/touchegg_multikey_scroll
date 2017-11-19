@@ -41,6 +41,7 @@ public:
         NO_ACTION,
         MOUSE_CLICK,
         SCROLL,
+        KEYSCROLL,
         MINIMIZE_WINDOW,
         MAXIMIZE_RESTORE_WINDOW,
         CLOSE_WINDOW,
