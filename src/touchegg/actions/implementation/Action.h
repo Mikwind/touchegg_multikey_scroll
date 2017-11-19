@@ -41,7 +41,7 @@ public:
         : settings(settings),
           window(window) {
 
-        at_start = false;     
+        at_start = false;
     }
 
     virtual ~Action() {}
@@ -55,7 +55,7 @@ public:
     Action(const QString &settings, const QString &timing, Window window)
         : settings(settings),
           window(window) {
-    
+
         if (timing == "AT_START") {
             at_start = true;
         } else {

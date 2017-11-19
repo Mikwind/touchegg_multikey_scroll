@@ -38,12 +38,12 @@ KeyScroll::KeyScroll(const QString &settings, Window window)
     QStringList mainStr = settings.split(":");
     if (mainStr.length() < 2)
         error = true;
-    
+
     foreach(QString setting , mainStr){
         QStringList settingPair = ((QString)setting).split("=");
         if(!error && settingPair.length() == 2){
             if(settingPair.at(0) == "SPEED") {
-                
+
                 bool ok;
                 int configSpeed = QString(settingPair.at(1)).toInt(&ok);
                 if (ok && configSpeed >= 1 && configSpeed <= 10) {
@@ -125,7 +125,7 @@ void KeyScroll::executeStart(const QHash<QString, QVariant>& /*attrs*/) {
         for (int n = 0; n < this->holdDownKeys.length(); n++) {
         XTestFakeKeyEvent(QX11Info::display(), this->holdDownKeys.at(n), true, 0);
     }
-    
+
 }
 
 void KeyScroll::executeUpdate(const QHash<QString, QVariant>& attrs)
@@ -153,7 +153,7 @@ void KeyScroll::executeUpdate(const QHash<QString, QVariant>& attrs)
             //UP
             XFlush(QX11Info::display());
         }
-    }   
+    }
 
     // Horizontal scroll
     if (deltaX > 0) {
@@ -181,7 +181,7 @@ void KeyScroll::executeUpdate(const QHash<QString, QVariant>& attrs)
 void KeyScroll::executeFinish(const QHash<QString, QVariant>& /*attrs*/) {
         for (int n = 0; n < this->holdDownKeys.length(); n++) {
         XTestFakeKeyEvent(QX11Info::display(), this->holdDownKeys.at(n), false, 0);
-    }   
+    }
 }
 
 void KeyScroll::sendKeysUp() {

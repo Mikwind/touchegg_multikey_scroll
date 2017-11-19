@@ -42,7 +42,7 @@ ChangeDesktop::ChangeDesktop(const QString &settings, const QString &timing, Win
 // **********                                        PUBLIC METHODS                                        ********** //
 // ****************************************************************************************************************** //
 
-void ChangeDesktop::executeStart(const QHash<QString, QVariant>& /*attrs*/) 
+void ChangeDesktop::executeStart(const QHash<QString, QVariant>& /*attrs*/)
 {
     if (at_start) {
         changeDesktop();
