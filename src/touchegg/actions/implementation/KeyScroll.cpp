@@ -56,6 +56,7 @@ KeyScroll::KeyScroll(const QString &settings, Window window)
 
     // Read the keys to send from te configuration
     QStringList keys = ((QString)mainStr.at(1)).split("+");
+    size_t k = 0;
 
     foreach(QString key, keys) {
         if (key == "Control" || key == "Shift" || key == "Super" || key == "Alt") {
@@ -72,7 +73,13 @@ KeyScroll::KeyScroll(const QString &settings, Window window)
         } else {
             KeySym keySym = XStringToKeysym(key.toStdString().c_str());
             KeyCode keyCode = XKeysymToKeycode(QX11Info::display(), keySym);
-            this->pressBetweenKeys.append(keyCode);
+            if(k == 0){
+                this->pressBetweenKeysUp.append(keyCode);
+            }
+            if(k == 1){
+                this->pressBetweenKeysDown.append(keyCode);
+            }
+            k++;
         }
     }
 
@@ -118,7 +125,8 @@ void KeyScroll::executeUpdate(const QHash<QString, QVariant>& attrs)
 
         while (this->downKeyScrollSpace >= this->verticalSpeed) {
             this->downKeyScrollSpace -= this->verticalSpeed;
-            sendKeys();
+            sendKeysDown();
+            //DOWN
             XFlush(QX11Info::display());
         }
 
@@ -127,7 +135,8 @@ void KeyScroll::executeUpdate(const QHash<QString, QVariant>& attrs)
 
         while (this->upKeyScrollSpace >= this->verticalSpeed) {
             this->upKeyScrollSpace -= this->verticalSpeed;
-            sendKeys();
+            sendKeysUp();
+            //UP
             XFlush(QX11Info::display());
         }
     }   
@@ -138,6 +147,7 @@ void KeyScroll::executeUpdate(const QHash<QString, QVariant>& attrs)
 
         while (this->rightKeyScrollSpace >= this->horizontalSpeed) {
             this->rightKeyScrollSpace -= this->horizontalSpeed;
+            //RIGHT
             XFlush(QX11Info::display());
         }
 
@@ -146,6 +156,7 @@ void KeyScroll::executeUpdate(const QHash<QString, QVariant>& attrs)
 
         while (this->leftKeyScrollSpace >= this->horizontalSpeed) {
             this->leftKeyScrollSpace -= this->horizontalSpeed;
+            //LEFT
             XFlush(QX11Info::display());
         }
     }
@@ -157,11 +168,16 @@ void KeyScroll::executeFinish(const QHash<QString, QVariant>& /*attrs*/) {
     }   
 }
 
-void KeyScroll::sendKeys() {
+void KeyScroll::sendKeysUp() {
+    for (int n = 0; n < this->pressBetweenKeysUp.length(); n++) {
+        XTestFakeKeyEvent(QX11Info::display(), this->pressBetweenKeysUp.at(n), true, 0);
+        XTestFakeKeyEvent(QX11Info::display(), this->pressBetweenKeysUp.at(n), false, 0);
+    }
+}
 
-
-    for (int n = 0; n < this->pressBetweenKeys.length(); n++) {
-        XTestFakeKeyEvent(QX11Info::display(), this->pressBetweenKeys.at(n), true, 0);
-        XTestFakeKeyEvent(QX11Info::display(), this->pressBetweenKeys.at(n), false, 0);
+void KeyScroll::sendKeysDown() {
+    for (int n = 0; n < this->pressBetweenKeysDown.length(); n++) {
+        XTestFakeKeyEvent(QX11Info::display(), this->pressBetweenKeysDown.at(n), true, 0);
+        XTestFakeKeyEvent(QX11Info::display(), this->pressBetweenKeysDown.at(n), false, 0);
     }
 }

@@ -79,7 +79,12 @@ private:
     /**
      * Helper method to actually send the keys.
      */
-    void sendKeys();
+    void sendKeysUp();
+    
+    /**
+     * Helper method to actually send the keys.
+     */
+    void sendKeysDown();
 
     /**
      * Keys to hold down while sending the rest of keys.
@@ -89,7 +94,9 @@ private:
     /**
      * Keys to send while holdDownKeys are sending.
      */
-    QList<KeyCode> pressBetweenKeys;
+    QList<KeyCode> pressBetweenKeysUp;
+    
+    QList<KeyCode> pressBetweenKeysDown;
 
 };
 
