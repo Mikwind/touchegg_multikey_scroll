@@ -49,8 +49,8 @@ KeyScroll::KeyScroll(const QString &settings, Window window)
         bool ok;
         int configSpeed = QString(mainStrSpeed.at(1)).toInt(&ok);
         if (ok && configSpeed >= 1 && configSpeed <= 10) {
-            this->verticalSpeed   = 40 - 2 * configSpeed;
-            this->horizontalSpeed = 40 - 2 * configSpeed;
+            this->verticalSpeed   = 100 - 2 * configSpeed;
+            this->horizontalSpeed = 100 - 2 * configSpeed;
         } else {
             error = true;
         }
@@ -58,23 +58,45 @@ KeyScroll::KeyScroll(const QString &settings, Window window)
         error = true;
     }
 
-    // Inverted
-    QStringList mainStrInv = mainStr.at(1).split("=");
-    if (!error && mainStrInv.length() == 2 && mainStrInv.at(0) == "INVERTED") {
-        if (mainStrInv.at(1) == "true") {
-            this->buttonUp         = 5;
-            this->buttonDown       = 4;
-            this->buttonLeft       = 7;
-            this->buttonRight      = 6;
+    // Read the keys to send from te configuration
+    QStringList keys = ((QString)mainStr.at(1)).split("+");
+
+    foreach(QString key, keys) {
+        if (key == "Control" || key == "Shift" || key == "Super" || key == "Alt") {
+            key = key.append("_L");
+            KeySym keySym = XStringToKeysym(key.toStdString().c_str());
+            KeyCode keyCode = XKeysymToKeycode(QX11Info::display(), keySym);
+            this->holdDownKeys.append(keyCode);
+
+        } else if (key == "AltGr") {
+            KeySym keySym = XStringToKeysym("Alt_R");
+            KeyCode keyCode = XKeysymToKeycode(QX11Info::display(), keySym);
+            this->holdDownKeys.append(keyCode);
+
+        } else {
+            KeySym keySym = XStringToKeysym(key.toStdString().c_str());
+            KeyCode keyCode = XKeysymToKeycode(QX11Info::display(), keySym);
+            this->pressBetweenKeys.append(keyCode);
         }
-    } else {
-        error = true;
     }
 
 
     if (error) {
         qWarning() << "Error reading KEYSCROLL settings, using the default settings";
     }
+    // Bring the window under the cursor to front, because only the window with the focus can receive keys
+    XClientMessageEvent event;
+    event.window = this-> window;
+    event.type = ClientMessage;
+    event.message_type = XInternAtom(QX11Info::display(), "_NET_ACTIVE_WINDOW", false);
+    event.format = 32;
+    event.data.l[0] = 2;
+    event.data.l[1] = CurrentTime;
+    event.data.l[2] = 0;
+
+    XSendEvent(QX11Info::display(), QX11Info::appRootWindow(QX11Info::appScreen()), false,
+            (SubstructureNotifyMask | SubstructureRedirectMask), (XEvent *)&event);
+    XFlush(QX11Info::display());
 }
 
 
@@ -82,7 +104,12 @@ KeyScroll::KeyScroll(const QString &settings, Window window)
 // **********                                        PUBLIC METHODS                                        ********** //
 // ****************************************************************************************************************** //
 
-void KeyScroll::executeStart(const QHash<QString, QVariant>& /*attrs*/) {}
+void KeyScroll::executeStart(const QHash<QString, QVariant>& /*attrs*/) {
+        for (int n = 0; n < this->holdDownKeys.length(); n++) {
+        XTestFakeKeyEvent(QX11Info::display(), this->holdDownKeys.at(n), true, 0);
+    }
+    
+}
 
 void KeyScroll::executeUpdate(const QHash<QString, QVariant>& attrs)
 {
@@ -95,8 +122,7 @@ void KeyScroll::executeUpdate(const QHash<QString, QVariant>& attrs)
 
         while (this->downKeyScrollSpace >= this->verticalSpeed) {
             this->downKeyScrollSpace -= this->verticalSpeed;
-            XTestFakeButtonEvent(QX11Info::display(), this->buttonDown, true, 0);
-            XTestFakeButtonEvent(QX11Info::display(), this->buttonDown, false, 0);
+            sendKeys();
             XFlush(QX11Info::display());
         }
 
@@ -105,11 +131,10 @@ void KeyScroll::executeUpdate(const QHash<QString, QVariant>& attrs)
 
         while (this->upKeyScrollSpace >= this->verticalSpeed) {
             this->upKeyScrollSpace -= this->verticalSpeed;
-            XTestFakeButtonEvent(QX11Info::display(), this->buttonUp, true, 0);
-            XTestFakeButtonEvent(QX11Info::display(), this->buttonUp, false, 0);
+            sendKeys();
             XFlush(QX11Info::display());
         }
-    }
+    }   
 
     // Horizontal scroll
     if (deltaX > 0) {
@@ -134,4 +159,17 @@ void KeyScroll::executeUpdate(const QHash<QString, QVariant>& attrs)
     }
 }
 
-void KeyScroll::executeFinish(const QHash<QString, QVariant>& /*attrs*/) {}
+void KeyScroll::executeFinish(const QHash<QString, QVariant>& /*attrs*/) {
+        for (int n = 0; n < this->holdDownKeys.length(); n++) {
+        XTestFakeKeyEvent(QX11Info::display(), this->holdDownKeys.at(n), false, 0);
+    }   
+}
+
+void KeyScroll::sendKeys() {
+
+
+    for (int n = 0; n < this->pressBetweenKeys.length(); n++) {
+        XTestFakeKeyEvent(QX11Info::display(), this->pressBetweenKeys.at(n), true, 0);
+        XTestFakeKeyEvent(QX11Info::display(), this->pressBetweenKeys.at(n), false, 0);
+    }
+}

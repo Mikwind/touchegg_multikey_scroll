@@ -95,6 +95,21 @@ private:
      * Button of the mouse to scroll right.
      */
     int buttonRight;
+    protected:
+    /**
+     * Helper method to actually send the keys.
+     */
+    void sendKeys();
+
+    /**
+     * Keys to hold down while sending the rest of keys.
+     */
+    QList<KeyCode> holdDownKeys;
+
+    /**
+     * Keys to send while holdDownKeys are sending.
+     */
+    QList<KeyCode> pressBetweenKeys;
 
 };
 
