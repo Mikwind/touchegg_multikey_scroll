@@ -31,11 +31,7 @@ KeyScroll::KeyScroll(const QString &settings, Window window)
       upKeyScrollSpace(0),
       downKeyScrollSpace(0),
       leftKeyScrollSpace(0),
-      rightKeyScrollSpace(0),
-      buttonUp(4),
-      buttonDown(5),
-      buttonLeft(6),
-      buttonRight(7)
+      rightKeyScrollSpace(0)
 {
     bool error = false;
 
@@ -142,8 +138,6 @@ void KeyScroll::executeUpdate(const QHash<QString, QVariant>& attrs)
 
         while (this->rightKeyScrollSpace >= this->horizontalSpeed) {
             this->rightKeyScrollSpace -= this->horizontalSpeed;
-            XTestFakeButtonEvent(QX11Info::display(), this->buttonRight, true, 0);
-            XTestFakeButtonEvent(QX11Info::display(), this->buttonRight, false, 0);
             XFlush(QX11Info::display());
         }
 
@@ -152,8 +146,6 @@ void KeyScroll::executeUpdate(const QHash<QString, QVariant>& attrs)
 
         while (this->leftKeyScrollSpace >= this->horizontalSpeed) {
             this->leftKeyScrollSpace -= this->horizontalSpeed;
-            XTestFakeButtonEvent(QX11Info::display(), this->buttonLeft, true, 0);
-            XTestFakeButtonEvent(QX11Info::display(), this->buttonLeft, false, 0);
             XFlush(QX11Info::display());
         }
     }

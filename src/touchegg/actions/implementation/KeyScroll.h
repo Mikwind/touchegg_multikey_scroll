@@ -75,26 +75,6 @@ private:
     int rightKeyScrollSpace;
 
     //------------------------------------------------------------------------------------------------------------------
-
-    /**
-     * Button of the mouse to scroll up.
-     */
-    int buttonUp;
-
-    /**
-     * Button of the mouse to scroll down.
-     */
-    int buttonDown;
-
-    /**
-     * Button of the mouse to scroll left.
-     */
-    int buttonLeft;
-
-    /**
-     * Button of the mouse to scroll right.
-     */
-    int buttonRight;
     protected:
     /**
      * Helper method to actually send the keys.
