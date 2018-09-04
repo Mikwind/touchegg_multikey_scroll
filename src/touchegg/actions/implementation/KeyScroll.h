@@ -25,7 +25,7 @@
 #include "src/touchegg/actions/implementation/Action.h"
 
 /**
- * Emulates the mouse whell.
+ * Emulates sending multiple keystrokes while scrolling.
  */
 class KeyScroll : public Action
 {
