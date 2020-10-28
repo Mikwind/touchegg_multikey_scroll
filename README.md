@@ -1,3 +1,8 @@
+This is a fork of Jose Esposito's touchegg that adds the functionality of emulating multiple key presses via multi-finger scrolling.  This allows, for example to use 3 finger scrolling to adjust the volume or brightness.
+
+TODO: 
+Update to latest libinput changes, will do a pull request then
+
 **Follow Touchégg on...** [![](https://lh3.googleusercontent.com/-kRgKvb-T4_4/T9psNwZN3TI/AAAAAAAAANA/pwasxapdWm0/s33/twitter.png "Twitter")](https://twitter.com/#!/Jose__Exposito)
 
 About Touchégg:
